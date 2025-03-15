@@ -4,6 +4,7 @@ const router = express.Router();
 const adminLogin ='../views/layouts/admin'
 const User = require('../model/user');
 const jwt = require('jsonwebtoken');
+const Post = require('../model/post')
 
 const authMiddleware = require('../config/MiddleWare/Authentication')
 
@@ -50,16 +51,9 @@ router.get('/admin',async (req,res) =>{
         }
     })
 
-    router.get('/dashboard',authMiddleware, async (req,res) =>{
-        res.render('admin/dashboard')
-    });
-
-
-    const registration = '../views/layouts/register'
-
-
-
 // GET register ADMIN registration
+
+// const registration = '../views/layouts/register'
 
 // -------------------although this is working perfectly okay but we have created a seperate route for restration ----------
 
@@ -77,5 +71,75 @@ router.get('/admin',async (req,res) =>{
 //     }
 // })
 
-    
+
+router.get('/dashboard',authMiddleware, async (req,res) =>{
+
+    try{
+        const locals = {
+                        "title": "DashBoard Panel",
+                        "description": "Hello this is dashboard panel"
+                 }
+
+        const data = await Post.find();
+        res.render('admin/dashboard',{
+            locals,
+            data,
+            layout: adminLogin
+        });
+
+    }
+    catch(e){
+        console.log(e);
+}
+})
+
+//Admin Create new post
+
+router.get('/add-post',authMiddleware, async (req,res) =>{
+
+    try{
+        const locals = {
+                        "title": "add post",
+                        "description": "Hello this is create panel"
+                 }
+
+        const data = await Post.find();
+        res.render('admin/add-post',{
+            locals,
+            layout: adminLogin
+        });
+
+    }
+    catch(e){
+        console.log(e);
+}
+})
+
+// admin insert that created post into the database
+
+router.post('/add-post',authMiddleware, async (req,res) =>{
+
+    try{
+       console.log(req.body)
+
+       try{
+        const newPost = new Post({
+            title: req.body.title,
+            body: req.body.body
+        });
+
+        await Post.create(newPost)
+        res.redirect('/dashboard')
+
+       }
+       catch(e){
+        console.log("database error during creating a new post", e);
+       }
+    }
+    catch(e){
+        console.log(e);
+}
+}) 
+
+
  module.exports = router;

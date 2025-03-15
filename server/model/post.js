@@ -8,7 +8,7 @@ const PostSchema = new schema({
         required: true
     },
     body: {
-        type: String,
+        type: String, 
         required: true
     },
     createdAt: {
