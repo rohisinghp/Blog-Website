@@ -30,7 +30,7 @@ router.get('/admin',async (req,res) =>{
     //GET ADMIN Check login
 
     router.post('/admin',async (req,res) =>{
-     
+      
         try{
            const {username, password} = req.body;
          
@@ -103,7 +103,6 @@ router.get('/add-post',authMiddleware, async (req,res) =>{
                         "description": "Hello this is create panel"
                  }
 
-        const data = await Post.find();
         res.render('admin/add-post',{
             locals,
             layout: adminLogin
@@ -140,6 +139,62 @@ router.post('/add-post',authMiddleware, async (req,res) =>{
         console.log(e);
 }
 }) 
+
+//Edit/Delete a Post
+
+router.put('/edit-post/:id',authMiddleware, async (req,res) =>{
+
+    try{
+    
+    await Post.findByIdAndUpdate(req.params.id, {
+        title: req.body.title,
+        body: req.body.body,
+        updatedAt: Date.now()
+    });
+    
+    res.redirect(`/edit-post/${req.params.id}`);
+
+    
+        
+    }
+    catch(e){
+        console.log(e);
+}
+})
+
+
+router.get('/edit-post/:id',authMiddleware, async (req,res) =>{
+
+    try{
+    
+     const data = await Post.findOne({_id : req.params.id});
+
+     res.render('admin/edit-post',{
+            layout: adminLogin,
+            data
+        });
+    }
+    catch(e){
+        console.log(e);
+}
+})
+
+router.delete('/delete-post/:id',authMiddleware, async (req,res) =>{
+
+    try{
+    
+        await Post.deleteOne({_id: req.params.id})
+    res.redirect('/dashboard')
+    }
+    catch(e){
+        console.log(e);
+}
+})
+
+router.get('/logout',(req,res)=>{
+    res.clearCookie('token');
+    res.redirect('/')
+})
 
 
  module.exports = router;
